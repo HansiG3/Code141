@@ -1,0 +1,98 @@
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import PlainNavbar from '../../components/Navbar/PlainNavbar';
+import RightsReservedFooter from '../../components/Footer/RightsReservedFooter';
+import LoginForm from './LoginForm';
+import LoadingSpinner from '../../components/Spinners/Spinners';
+// import  { fetchAPI }  from '../../Scripts/Axios';  // ❌ Commented out to avoid backend call
+
+// LoginType = 'Students' or 'Professors'
+function LoginPage({ LoginType }) {
+
+    const [formData, setFormData] = useState({
+        Institution: '',
+        Username: '',
+        Password: '',
+        LoginType: LoginType
+    });
+
+    const [Institutions, setInstitutions] = useState(null);
+
+    // Handle Form Submission
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            // let response = await axios.post('/login', formData, { withCredentials: true }); // ❌ Disabled backend call
+            // console.log(response.data);
+
+            // ✅ Mock success login
+            toast.success("Login successful (mock)");
+            localStorage.setItem(`${LoginType}Login`, true);
+            window.location.href = `/${LoginType.toLowerCase()}/assignments`;
+
+        } catch (error) {
+            toast.error(`Error while Submitting Form: ${error}`);
+        }
+    };
+
+    const handleInputChange = (event) => {
+        const { id, value } = event.target;
+        setFormData({
+            ...formData,
+            [id]: value
+        });
+    };
+
+    // Fetching Institutions (mock instead of backend)
+    useEffect(() => {
+        // const fetchInstitutions = async () => {
+        //     try {
+        //         const response = await fetchAPI('/registeredColleges');
+        //         setInstitutions(response.data.result);
+        //     } catch (error) {
+        //         toast.error(`Error fetching Institution. Please try again later. err : ${error}`);
+        //     }
+        // };
+        // fetchInstitutions();
+
+        // ✅ Mock data
+        setInstitutions([
+            { _id: "1", Name: "Test College A" },
+            { _id: "2", Name: "Test College B" }
+        ]);
+    }, []);
+
+    // Redirect if already logged in
+    if (localStorage.getItem(`${LoginType}Login`) === 'true') {
+        window.location.href = `/${LoginType.toLowerCase()}/assignments`;
+    }
+
+    if (Institutions) {
+        return (
+            <>
+                <PlainNavbar />
+                <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '80vh' }}>
+                    <div className="card align-items-center" style={{ backgroundColor: 'black', color: 'white' }}>
+                        <div className="card-body">
+                            <h5 className="card-title mb-4 text-center" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                {LoginType} LOGIN
+                            </h5>
+                            <LoginForm
+                                handleSubmit={handleSubmit}
+                                handleInputChange={handleInputChange}
+                                Institutions={Institutions}
+                                selectedInstitution={formData.Institution}
+                            />
+                        </div>
+                    </div>
+                </div>
+                <RightsReservedFooter />
+            </>
+        );
+    } else {
+        return <LoadingSpinner />;
+    }
+}
+
+export default LoginPage;
