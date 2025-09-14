@@ -20,21 +20,30 @@ function LoginPage({ LoginType }) {
     const [Institutions, setInstitutions] = useState(null);
 
     // Handle Form Submission
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        try {
-            // let response = await axios.post('/login', formData, { withCredentials: true }); // ❌ Disabled backend call
-            // console.log(response.data);
-
-            // ✅ Mock success login
-            toast.success("Login successful (mock)");
-            localStorage.setItem(`${LoginType}Login`, true);
+// ...existing code...
+const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+        // Adjust the URL if your backend runs on a different port or host
+        let response = await axios.post(
+            "http://localhost:8081/login",
+            formData,
+            { withCredentials: true }
+        );
+        if (response.data.success) {
+            toast.success("Login successful!");
             window.location.href = `/${LoginType.toLowerCase()}/assignments`;
-
-        } catch (error) {
-            toast.error(`Error while Submitting Form: ${error}`);
+        } else {
+            toast.error(response.data.message || "Login failed");
+        }
+    } catch (error) {
+        toast.error(
+            error.response?.data?.message ||
+            `Error while Submitting Form: ${error.message}`
+        );
         }
     };
+
 
     const handleInputChange = (event) => {
         const { id, value } = event.target;
@@ -64,9 +73,9 @@ function LoginPage({ LoginType }) {
     }, []);
 
     // Redirect if already logged in
-    if (localStorage.getItem(`${LoginType}Login`) === 'true') {
-        window.location.href = `/${LoginType.toLowerCase()}/assignments`;
-    }
+    // if (localStorage.getItem(`${LoginType}Login`) === 'true') {
+    //     window.location.href = `/${LoginType.toLowerCase()}/assignments`;
+    // }
 
     if (Institutions) {
         return (
