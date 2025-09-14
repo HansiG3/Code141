@@ -1,4 +1,3 @@
-import React from 'react';
 
 function LandingPageCard({ title, content, btntext, btnlink }) {
     return (
